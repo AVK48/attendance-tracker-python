@@ -23,15 +23,43 @@ def add_student():
 
     print("Student added successfully")
 
+from datetime import date
+ATTENDANCE_FILE = "data/attendance.csv"
+def mark_attendance():
+    roll_no = input("Enter roll number: ").strip()
+    status = input("Enter status (P/A):").strip().upper()
+    
+    if status not in ("P","A"):
+        print("Invalid status.Use P or A.")
+        return
+    with open(DATA_FILE, "r", newline="") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row["roll_no"] == roll_no:
+                today = date.today().isoformat()
+
+                with open(ATTENDANCE_FILE, "a", newline="") as afile:
+                    writer = csv.writer(afile)
+                    writer.writerow([roll_no, today, status])
+
+                print("Attendance marked.")
+                return
+
+    print("Roll number not found.")    
+
+
 def main():
     while True:
         print("\n1. Add Student")
-        print("2. Exit")
+        print("\n2. Mark Attendance.")
+        print("3. Exit")
         choice = input("Choose option: ")
 
         if choice == "1":
             add_student()
         elif choice == "2":
+            mark_attendance()
+        elif choice == "3":
             print("Exiting...")
             break
         else:
