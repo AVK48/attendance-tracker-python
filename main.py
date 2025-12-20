@@ -24,7 +24,9 @@ def add_student():
     print("Student added successfully")
 
 from datetime import date
+
 ATTENDANCE_FILE = "data/attendance.csv"
+
 def mark_attendance():
     roll_no = input("Enter roll number: ").strip()
     status = input("Enter status (P/A):").strip().upper()
@@ -45,14 +47,35 @@ def mark_attendance():
                 print("Attendance marked.")
                 return
 
-    print("Roll number not found.")    
+    print("Roll number not found.")   
+def view_attendance():
+    roll_no = input("Enter roll number: ").strip()
+    total_days = 0
+    present_days =0
+   
+    with open(ATTENDANCE_FILE, "r", newline="") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row["roll_no"] == roll_no:
+                total_days +=1
+                if row["status"] == "P":
+                   present_days +=1
+    if total_days == 0:
+        print("No attendance records found")
+        return
+
+    percentage = (present_days/total_days) * 100
+    print(f"Total days : {total_days}")
+    print(f"Present days : {present_days}")
+    print(f"Attendance %: {percentage:.2f}")
 
 
 def main():
     while True:
         print("\n1. Add Student")
-        print("\n2. Mark Attendance.")
-        print("3. Exit")
+        print("2. Mark Attendance.")
+        print("3. View Attendance")
+        print("4. Exit")
         choice = input("Choose option: ")
 
         if choice == "1":
@@ -60,6 +83,8 @@ def main():
         elif choice == "2":
             mark_attendance()
         elif choice == "3":
+            view_attendance()
+        elif choice == "4":
             print("Exiting...")
             break
         else:
