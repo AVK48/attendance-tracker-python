@@ -1,3 +1,5 @@
+print("RUNNING FILE:", __file__)
+
 import csv
 
 DATA_FILE = "data/students.csv"
@@ -28,6 +30,7 @@ from datetime import date
 ATTENDANCE_FILE = "data/attendance.csv"
 
 def mark_attendance():
+    today = date.today().isoformat()
     roll_no = input("Enter roll number: ").strip()
     status = input("Enter status (P/A):").strip().upper()
     
@@ -48,6 +51,8 @@ def mark_attendance():
                 return
 
     print("Roll number not found.")   
+
+
 def view_attendance():
     roll_no = input("Enter roll number: ").strip()
     total_days = 0
@@ -69,13 +74,63 @@ def view_attendance():
     print(f"Present days : {present_days}")
     print(f"Attendance %: {percentage:.2f}")
 
+from datetime import datetime
+
+def view_attendance_date_range():
+    roll_no = input("Enter roll number: ").strip()
+    from_date = input("From date (YYYY-MM-DD): ").strip()
+    to_date = input("To date (YYYY-MM-DD): ").strip()
+
+
+    try:
+        start = datetime.strptime(from_date, "%Y-%m-%d").date()
+        end = datetime.strptime(to_date, "%Y-%m-%d").date()
+    except ValueError as e:
+        print("Invalid date format:", e)
+        return
+
+    if start > end:
+        print("From date cannot be after To date.")
+        return
+
+    total_days = 0
+    present_days = 0
+
+    with open(ATTENDANCE_FILE, "r", newline="") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row["roll_no"] != roll_no:
+                continue
+
+            record_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
+
+            if start <= record_date <= end:
+                total_days += 1
+                if row["status"] == "P":
+                    present_days += 1
+
+    if total_days == 0:
+        print("No attendance records in this range.")
+        return
+
+    percentage = (present_days / total_days) * 100
+
+    print(f"From         : {from_date}")
+    print(f"To           : {to_date}")
+    print(f"Total Days   : {total_days}")
+    print(f"Present Days : {present_days}")
+    print(f"Attendance % : {percentage:.2f}")
+
+
+
 
 def main():
     while True:
         print("\n1. Add Student")
         print("2. Mark Attendance.")
         print("3. View Attendance")
-        print("4. Exit")
+        print("4. View Attendance (Data Range)")
+        print("5. Exit")
         choice = input("Choose option: ")
 
         if choice == "1":
@@ -85,6 +140,8 @@ def main():
         elif choice == "3":
             view_attendance()
         elif choice == "4":
+            view_attendance_date_range()
+        elif choice == "5":
             print("Exiting...")
             break
         else:
