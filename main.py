@@ -2,7 +2,17 @@ print("RUNNING FILE:", __file__)
 
 import csv
 
-DATA_FILE = "data/students.csv"
+STUDENTS_FILE = "data/students.csv"
+
+
+def student_exists(roll_no):
+    with open(STUDENTS_FILE, "r", newline="") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row["roll_no"] == roll_no:
+                return True
+    return False
+
 
 def add_student():
     roll_no = input("Enter roll number: ").strip()
@@ -12,14 +22,14 @@ def add_student():
         print("Invalid input")
         return
 
-    with open(DATA_FILE, "r", newline="") as file:
+    with open(STUDENTS_FILE, "r", newline="") as file:
         reader = csv.DictReader(file)
         for row in reader:
             if row["roll_no"] == roll_no:
                 print("Roll number already exists")
                 return
 
-    with open(DATA_FILE, "a", newline="") as file:
+    with open(STUDENTS_FILE, "a", newline="") as file:
         writer = csv.writer(file)
         writer.writerow([roll_no, name])
 
@@ -29,15 +39,22 @@ from datetime import date
 
 ATTENDANCE_FILE = "data/attendance.csv"
 
+
+
 def mark_attendance():
     today = date.today().isoformat()
     roll_no = input("Enter roll number: ").strip()
+    if not student_exists(roll_no):
+       print("Roll number not found.")
+       return
     status = input("Enter status (P/A):").strip().upper()
+
+    
     
     if status not in ("P","A"):
         print("Invalid status.Use P or A.")
         return
-    with open(DATA_FILE, "r", newline="") as file:
+    with open(STUDENTS_FILE, "r", newline="") as file:
         reader = csv.DictReader(file)
         for row in reader:
             if row["roll_no"] == roll_no:
@@ -53,8 +70,12 @@ def mark_attendance():
     print("Roll number not found.")   
 
 
-def view_attendance():
+def view_attendance_summary():
     roll_no = input("Enter roll number: ").strip()
+
+    if not student_exists(roll_no):
+        print("Roll number not found.")
+        return
     total_days = 0
     present_days =0
    
@@ -78,6 +99,9 @@ from datetime import datetime
 
 def view_attendance_date_range():
     roll_no = input("Enter roll number: ").strip()
+    if not student_exists(roll_no):
+       print("Roll number not found.")
+       return
     from_date = input("From date (YYYY-MM-DD): ").strip()
     to_date = input("To date (YYYY-MM-DD): ").strip()
 
@@ -138,7 +162,7 @@ def main():
         elif choice == "2":
             mark_attendance()
         elif choice == "3":
-            view_attendance()
+            view_attendance_summary()
         elif choice == "4":
             view_attendance_date_range()
         elif choice == "5":
