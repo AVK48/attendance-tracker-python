@@ -1,8 +1,16 @@
 print("RUNNING FILE:", __file__)
 
 import csv
+from datetime import datetime, date
+
 
 STUDENTS_FILE = "data/students.csv"
+ATTENDANCE_FILE = "data/attendance.csv"
+
+def sort_records_date(records):
+    return sorted(records, key = lambda row: row["date"])
+
+
 
 
 def student_exists(roll_no):
@@ -12,6 +20,29 @@ def student_exists(roll_no):
             if row["roll_no"] == roll_no:
                 return True
     return False
+
+def read_records():
+    with open(ATTENDANCE_FILE, "r", newline="") as file:
+        return list(csv.DictReader(file))
+
+def get_records(records, roll_no):
+    return [row for row in records if row["roll_no"]== roll_no]
+    
+    
+def present_streak(records):
+    current = 0
+    maximum = 0
+
+    for row in records:
+        if row["status"] == "P":
+            current += 1
+            maximum = max(maximum, current)
+        else:
+            current = 0
+
+    return maximum
+
+
 
 
 def add_student():
@@ -34,10 +65,6 @@ def add_student():
         writer.writerow([roll_no, name])
 
     print("Student added successfully")
-
-from datetime import date
-
-ATTENDANCE_FILE = "data/attendance.csv"
 
 
 
@@ -73,6 +100,8 @@ def mark_attendance():
 def view_attendance_summary():
     roll_no = input("Enter roll number: ").strip()
 
+
+
     if not student_exists(roll_no):
         print("Roll number not found.")
         return
@@ -89,13 +118,19 @@ def view_attendance_summary():
     if total_days == 0:
         print("No attendance records found")
         return
+    records = read_records()
+    student_records = get_records(records, roll_no)
+    ordered_records = sort_records_date(student_records)
+
+    streak = present_streak(ordered_records)
+
 
     percentage = (present_days/total_days) * 100
     print(f"Total days : {total_days}")
     print(f"Present days : {present_days}")
     print(f"Attendance %: {percentage:.2f}")
 
-from datetime import datetime
+
 
 def view_attendance_date_range():
     roll_no = input("Enter roll number: ").strip()
@@ -170,6 +205,8 @@ def main():
             break
         else:
             print("Invalid choice")
+
+
 
 if __name__ == "__main__":
     main()
