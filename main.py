@@ -126,9 +126,11 @@ def view_attendance_summary():
 
 
     percentage = (present_days/total_days) * 100
+    consistency_score = streak/total_days
     print(f"Total days : {total_days}")
     print(f"Present days : {present_days}")
     print(f"Attendance %: {percentage:.2f}")
+    print(f"Consistency score: {consistency_score:.2f}")
 
 
 
