@@ -7,6 +7,16 @@ from datetime import datetime, date
 STUDENTS_FILE = "data/students.csv"
 ATTENDANCE_FILE = "data/attendance.csv"
 
+
+def filter_records_by_date(records, start, end):
+    filtered = []
+    for row in records:
+        record_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
+        if start <= record_date <= end:
+            filtered.append(row)
+    return filtered
+
+
 def sort_records_date(records):
     return sorted(records, key = lambda row: row["date"])
 
@@ -183,6 +193,67 @@ def view_attendance_date_range():
     print(f"Attendance % : {percentage:.2f}")
 
 
+def generate_dataset():
+    from_date = input("From date (YYYY-MM-DD): ").strip()
+    to_date = input("To date (YYYY-MM-DD): ").strip()
+
+    try:
+        start = datetime.strptime(from_date, "%Y-%m-%d").date()
+        end = datetime.strptime(to_date, "%Y-%m-%d").date()
+    except ValueError:
+        print("Invalid date format.")
+        return
+
+    all_records = read_records()
+    date_filtered_records = filter_records_by_date(all_records, start, end)
+
+    with open("data/student_features.csv", "w", newline="") as file:
+        writer = csv.writer(file)
+
+        # header
+        writer.writerow([
+            "roll_no",
+            "from_date",
+            "to_date",
+            "total_days",
+            "present_days",
+            "attendance_pct",
+            "longest_streak",
+            "consistency"
+        ])
+
+        # loop over students
+        with open(STUDENTS_FILE, "r", newline="") as sfile:
+            reader = csv.DictReader(sfile)
+
+            for student in reader:
+                roll_no = student["roll_no"]
+
+                student_records = get_records(date_filtered_records, roll_no)
+                if not student_records:
+                    continue
+
+                ordered_records = sort_records_date(student_records)
+
+                total_days = len(ordered_records)
+                present_days = sum(1 for r in ordered_records if r["status"] == "P")
+
+                attendance_pct = (present_days / total_days) * 100
+                longest_streak = present_streak(ordered_records)
+                consistency = longest_streak / total_days
+
+                writer.writerow([
+                    roll_no,
+                    from_date,
+                    to_date,
+                    total_days,
+                    present_days,
+                    round(attendance_pct, 2),
+                    longest_streak,
+                    round(consistency, 2)
+                ])
+
+    print("Student feature dataset generated successfully.")
 
 
 def main():
@@ -191,7 +262,8 @@ def main():
         print("2. Mark Attendance.")
         print("3. View Attendance")
         print("4. View Attendance (Data Range)")
-        print("5. Exit")
+        print("5.Generate the Dataset")
+        print("6. Exit")
         choice = input("Choose option: ")
 
         if choice == "1":
@@ -203,6 +275,8 @@ def main():
         elif choice == "4":
             view_attendance_date_range()
         elif choice == "5":
+            generate_dataset()
+        elif choice == "6":
             print("Exiting...")
             break
         else:
