@@ -192,6 +192,21 @@ def view_attendance_date_range():
     print(f"Present Days : {present_days}")
     print(f"Attendance % : {percentage:.2f}")
 
+def validate_dataset(row):
+    if row["total_days"] <= 0:
+        return False
+    if row["present_days"] > row["total_days"]:
+        return False
+    if not (0 <= row["percentage"] <= 100):
+        return False
+    if not (0 <= row["consistency_score"] <= 1):
+        return False
+    if row["longest_streak"] > row["total_days"]:
+        return False
+    return True
+
+    
+
 
 def generate_dataset():
     from_date = input("From date (YYYY-MM-DD): ").strip()
@@ -209,6 +224,7 @@ def generate_dataset():
 
     with open("data/student_features.csv", "w", newline="") as file:
         writer = csv.writer(file)
+
 
         # header
         writer.writerow([
@@ -241,6 +257,19 @@ def generate_dataset():
                 attendance_pct = (present_days / total_days) * 100
                 longest_streak = present_streak(ordered_records)
                 consistency = longest_streak / total_days
+                
+                
+                row = {
+                "total_days": total_days,
+                "present_days": present_days,
+                "attendance_pct": attendance_pct,
+                "longest_streak": longest_streak,
+                "consistency": consistency
+                }
+
+                if not validate_dataset(row):
+                   continue
+
 
                 writer.writerow([
                     roll_no,
