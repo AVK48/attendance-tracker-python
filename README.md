@@ -1,9 +1,7 @@
 <div align="center">
-  <img src="./assets/banner.png" alt="Project Banner" width="100%" />
+  <img src="attendancetracker.png" alt="Project Banner" width="100%" />
 </div>
-  <!-- Dynamic Animated Header Banner -->
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,14,24&height=220&section=header&text=Attendance%20Tracker%20Python&fontSize=42&fontColor=fff&animation=fadeIn&fontAlignY=38&desc=Automated%20Attendance%20Logging,%20Defaulter%20Analytics%20%26%20Reporting%20Pipeline&descAlignY=58&descAlign=50" width="100%" alt="Header Banner" />
-
+ 
   # 📊 Attendance Tracker Python
   ### *A Lightweight, Automated Python Pipeline for Attendance Management, Threshold Analytics & Reporting*
 
